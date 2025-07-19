@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "948088271721",
+    "project_id": "guia-play",
+    "storage_bucket": "guia-play.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:948088271721:android:42e1f167769bc372b483f8",
+        "android_client_info": {
+          "package_name": "com.example.guia_play"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBd9X2V6It0_88n2Ubuam1yHtL94PDoqnc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
