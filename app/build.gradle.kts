@@ -60,9 +60,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
     implementation("com.google.firebase:firebase-analytics")
-    //
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("io.coil-kt:coil-compose:2.6.0")
-    //
+    implementation("com.google.firebase:firebase-auth-ktx")
     implementation("androidx.navigation:navigation-compose:2.7.7")
 }
