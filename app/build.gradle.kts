@@ -63,5 +63,9 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("com.google.firebase:firebase-auth-ktx")
+    // ViewModel
     implementation("androidx.navigation:navigation-compose:2.7.7")
+    // Koin
+    implementation("io.insert-koin:koin-android:4.0.3")
+    implementation("io.insert-koin:koin-androidx-compose:4.0.3")
 }

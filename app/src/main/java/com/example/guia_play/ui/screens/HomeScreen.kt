@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
@@ -19,40 +21,21 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.guia_play.data.datasources.FirebaseAuthDataSource
-import com.example.guia_play.data.datasources.FirestoreMediaDataSource
-import com.example.guia_play.data.datasources.FirestoreMyListDataSource
-import com.example.guia_play.data.repository.MediaRepository
-import com.example.guia_play.data.repository.MyListRepository
 import com.example.guia_play.ui.components.MovieCard
 import com.example.guia_play.ui.components.TopAppBarWithNavigationMenu
 import com.example.guia_play.ui.theme.GuiaPLayTheme
 import com.example.guia_play.ui.viewmodel.HomeViewModel
-import com.example.guia_play.ui.viewmodel.HomeViewModelFactory
 import com.example.guia_play.ui.viewmodel.ItemActionViewModel
-import com.example.guia_play.ui.viewmodel.ItemActionViewModelFactory
 import kotlinx.coroutines.launch
-import android.util.Log
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
-    val homeViewModel: HomeViewModel = viewModel(
-        factory = HomeViewModelFactory(
-            MediaRepository(FirestoreMediaDataSource())
-        )
-    )
-    val authDataSource = remember { FirebaseAuthDataSource() }
-
-    val itemActionViewModel: ItemActionViewModel = viewModel(
-        factory = ItemActionViewModelFactory(
-            MyListRepository(FirestoreMyListDataSource()),
-            authDataSource
-        )
-    )
+    // Usando koinViewModel()
+    val homeViewModel: HomeViewModel = koinViewModel()
+    // Usando koinViewModel()
+    val itemActionViewModel: ItemActionViewModel = koinViewModel()
 
     val uiState by homeViewModel.uiState.collectAsState()
     val searchText by homeViewModel.searchText.collectAsState()
@@ -71,11 +54,6 @@ fun HomeScreen(navController: NavController) {
         }
     }
 
-    val isUserLoggedIn = authDataSource.isUserLoggedIn()
-
-    // NOVO: Estado de rolagem para a tela
-    val scrollState = rememberScrollState()
-
     Scaffold(
         topBar = {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -92,7 +70,7 @@ fun HomeScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(scrollState) // APLICADO AQUI: Torna a coluna rolagem
+                .verticalScroll(rememberScrollState())
         ) {
             when {
                 uiState.isLoading -> {
@@ -105,21 +83,9 @@ fun HomeScreen(navController: NavController) {
                         Text(text = uiState.error ?: "Erro desconhecido", color = Color.Red)
                     }
                 }
-                !isUserLoggedIn -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = "Você precisa estar logado para ver o conteúdo.",
-                                color = Color.Gray,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(onClick = { navController.navigate("login") }) {
-                                Text("Fazer Login")
-                            }
-                        }
-                    }
-                }
+                // Nota: O ViewModel não deve saber se o usuário está logado. Essa lógica
+                // foi movida para a MainActivity. Se você quer esconder a tela,
+                // você deve usar a navegação.
                 else -> {
                     // Campo de Busca (OutlinedTextField)
                     OutlinedTextField(
@@ -179,7 +145,6 @@ fun HomeScreen(navController: NavController) {
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                             color = Color.White
                         )
-                        // LazyColumn já é rolagem por si só, mas a coluna pai precisa ser rolagem se houver outros elementos
                         LazyColumn(
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -193,7 +158,7 @@ fun HomeScreen(navController: NavController) {
                                     },
                                     isAddedToMyList = { mediaItem ->
                                         var isInList by remember { mutableStateOf(false) }
-                                        LaunchedEffect(mediaItem.id, authDataSource.getCurrentUserId()) {
+                                        LaunchedEffect(mediaItem.id) {
                                             isInList = itemActionViewModel.isItemInMyList(mediaItem.id)
                                         }
                                         isInList
@@ -237,7 +202,7 @@ fun HomeScreen(navController: NavController) {
                                             },
                                             isAddedToMyList = { mediaItem ->
                                                 var isInList by remember { mutableStateOf(false) }
-                                                LaunchedEffect(mediaItem.id, authDataSource.getCurrentUserId()) {
+                                                LaunchedEffect(mediaItem.id) {
                                                     isInList = itemActionViewModel.isItemInMyList(mediaItem.id)
                                                 }
                                                 isInList
@@ -280,7 +245,7 @@ fun HomeScreen(navController: NavController) {
                                             },
                                             isAddedToMyList = { mediaItem ->
                                                 var isInList by remember { mutableStateOf(false) }
-                                                LaunchedEffect(mediaItem.id, authDataSource.getCurrentUserId()) {
+                                                LaunchedEffect(mediaItem.id) {
                                                     isInList = itemActionViewModel.isItemInMyList(mediaItem.id)
                                                 }
                                                 isInList

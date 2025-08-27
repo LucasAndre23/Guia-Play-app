@@ -19,6 +19,7 @@ data class HomeUiState(
 
 class HomeViewModel(private val mediaRepository: MediaRepository) : ViewModel() {
 
+    // Uso do UI State
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 

@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
 
+    // Uso do UI State
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
@@ -25,7 +26,7 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
             try {
                 authRepository.login(email, password)
                 _eventFlow.emit(AuthEvent.LoginSuccess)
-                _uiState.value = _uiState.value.copy(isLoading = false, isAuthenticated = true)
+                _uiState.value = _uiState.value.copy(isLoading = false, isLoggedIn = true) // Alterado para isLoggedIn
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = e.localizedMessage ?: "Erro de login")
                 _eventFlow.emit(AuthEvent.Error(e.localizedMessage ?: "Erro desconhecido"))
@@ -39,7 +40,7 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
             try {
                 authRepository.register(email, password)
                 _eventFlow.emit(AuthEvent.RegisterSuccess)
-                _uiState.value = _uiState.value.copy(isLoading = false) // Não define isAuthenticated aqui, pois o login é feito separadamente
+                _uiState.value = _uiState.value.copy(isLoading = false) // Não define isLoggedIn aqui, pois o login é feito separadamente
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = e.localizedMessage ?: "Erro de registro")
                 _eventFlow.emit(AuthEvent.Error(e.localizedMessage ?: "Erro desconhecido"))
@@ -48,12 +49,12 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
     }
 
     fun checkAuthStatus() {
-        _uiState.value = _uiState.value.copy(isAuthenticated = authRepository.isUserLoggedIn())
+        _uiState.value = _uiState.value.copy(isLoggedIn = authRepository.isUserLoggedIn()) // Alterado para isLoggedIn
     }
 
     fun logout() {
         authRepository.logout()
-        _uiState.value = _uiState.value.copy(isAuthenticated = false)
+        _uiState.value = _uiState.value.copy(isLoggedIn = false) // Alterado para isLoggedIn
         viewModelScope.launch {
             _eventFlow.emit(AuthEvent.LogoutSuccess)
         }
@@ -67,7 +68,7 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
 data class AuthUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
-    val isAuthenticated: Boolean = false
+    val isLoggedIn: Boolean = false // Alterado para isLoggedIn
 )
 
 sealed class AuthEvent {

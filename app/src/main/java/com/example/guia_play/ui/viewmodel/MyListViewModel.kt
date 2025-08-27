@@ -21,6 +21,7 @@ class MyListViewModel(
     private val authDataSource: FirebaseAuthDataSource
 ) : ViewModel() {
 
+    // Uso do UI State
     private val _uiState = MutableStateFlow(MyListUiState())
     val uiState: StateFlow<MyListUiState> = _uiState.asStateFlow()
 

@@ -15,24 +15,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.guia_play.data.datasources.FirebaseAuthDataSource
-import com.example.guia_play.data.repository.AuthRepository
 import com.example.guia_play.ui.theme.GuiaPLayTheme
 import com.example.guia_play.ui.viewmodel.AuthEvent
 import com.example.guia_play.ui.viewmodel.AuthViewModel
-import com.example.guia_play.ui.viewmodel.AuthViewModelFactory
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavController) {
-    val authViewModel: AuthViewModel = viewModel(
-        factory = AuthViewModelFactory(AuthRepository(FirebaseAuthDataSource()))
-    )
+    // A única alteração está aqui: usando koinViewModel()
+    val authViewModel: AuthViewModel = koinViewModel()
     val uiState by authViewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()

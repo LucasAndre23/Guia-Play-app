@@ -6,11 +6,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.guia_play.data.datasources.FirebaseAuthDataSource
-import com.example.guia_play.data.repository.AuthRepository
 import com.example.guia_play.ui.viewmodel.AuthViewModel
-import com.example.guia_play.ui.viewmodel.AuthViewModelFactory
-import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,11 +17,15 @@ fun TopAppBarWithNavigationMenu(
     currentRoute: String?
 ) {
     var showMenu by remember { mutableStateOf(false) }
-    val authViewModel: AuthViewModel = viewModel(
-        factory = AuthViewModelFactory(AuthRepository(FirebaseAuthDataSource()))
-    )
-    val authDataSource = remember { FirebaseAuthDataSource() } // Para verificar o estado de login
-    val isUserLoggedIn = authDataSource.isUserLoggedIn()
+
+    // Usando koinViewModel() para injetar o AuthViewModel
+    val authViewModel: AuthViewModel = koinViewModel()
+    val uiState by authViewModel.uiState.collectAsState()
+
+    // Adicione este bloco LaunchedEffect
+    LaunchedEffect(Unit) {
+        authViewModel.checkAuthStatus()
+    }
 
     TopAppBar(
         title = { Text(title) },
@@ -37,8 +38,7 @@ fun TopAppBarWithNavigationMenu(
                 onDismissRequest = { showMenu = false }
             ) {
                 // Opções de navegação para telas principais (Início, Minha Lista)
-                // Apenas exibe se o usuário estiver logado.
-                if (isUserLoggedIn) {
+                if (uiState.isLoggedIn) {
                     DropdownMenuItem(
                         text = { Text("Início") },
                         onClick = {
@@ -66,16 +66,15 @@ fun TopAppBarWithNavigationMenu(
                     DropdownMenuItem(
                         text = { Text("Sair") },
                         onClick = {
-                            authViewModel.logout() // Chama a função de logout no ViewModel
-                            navController.navigate("login") { // Redireciona para a tela de login
+                            authViewModel.logout()
+                            navController.navigate("login") {
                                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
                             }
                             showMenu = false
                         }
                     )
                 } else {
-                    // Opções para usuário não logado (login ou cadastro)
-                    // Só mostra a opção "Login" se não estiver já na tela de login/register
+                    // Opções para usuário não logado
                     if (currentRoute != "login" && currentRoute != "register") {
                         DropdownMenuItem(
                             text = { Text("Login") },

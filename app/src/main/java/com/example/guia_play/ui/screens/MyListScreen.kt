@@ -18,38 +18,21 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.guia_play.data.datasources.FirebaseAuthDataSource
-import com.example.guia_play.data.datasources.FirestoreMyListDataSource
-import com.example.guia_play.data.repository.MyListRepository
 import com.example.guia_play.ui.components.MyListItemCard
 import com.example.guia_play.ui.components.TopAppBarWithNavigationMenu
 import com.example.guia_play.ui.theme.GuiaPLayTheme
 import com.example.guia_play.ui.viewmodel.MyListViewModel
 import com.example.guia_play.ui.viewmodel.ItemActionViewModel
-import com.example.guia_play.ui.viewmodel.MyListViewModelFactory
-import com.example.guia_play.ui.viewmodel.ItemActionViewModelFactory
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyListScreen(navController: NavController) {
-    val authDataSource = remember { FirebaseAuthDataSource() } // Instancia AuthDataSource
-    val myListRepository = remember { MyListRepository(FirestoreMyListDataSource()) } // Instancia MyListRepository
-
-    val myListViewModel: MyListViewModel = viewModel(
-        factory = MyListViewModelFactory(
-            myListRepository = myListRepository, // Passa o repositório
-            authDataSource = authDataSource // Passa o AuthDataSource
-        )
-    )
-
-    val itemActionViewModel: ItemActionViewModel = viewModel(
-        factory = ItemActionViewModelFactory(
-            myListRepository = myListRepository, // Reutiliza o mesmo repositório
-            authDataSource = authDataSource // Reutiliza o mesmo AuthDataSource
-        )
-    )
+    // Usando koinViewModel()
+    val myListViewModel: MyListViewModel = koinViewModel()
+    // Usando koinViewModel()
+    val itemActionViewModel: ItemActionViewModel = koinViewModel()
 
     val uiState by myListViewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -73,9 +56,6 @@ fun MyListScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         myListViewModel.loadMyList()
     }
-
-    // Verifica se o usuário está logado
-    val isUserLoggedIn = authDataSource.isUserLoggedIn()
 
     Scaffold(
         topBar = {
@@ -104,21 +84,6 @@ fun MyListScreen(navController: NavController) {
                 uiState.error != null -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(text = uiState.error ?: "Erro desconhecido", color = Color.Red)
-                    }
-                }
-                !isUserLoggedIn -> { // Se o usuário não está logado, mostre uma mensagem e peça para fazer login
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = "Você precisa estar logado para ver sua lista.",
-                                color = Color.Gray,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(onClick = { navController.navigate("login") }) {
-                                Text("Fazer Login")
-                            }
-                        }
                     }
                 }
                 uiState.myItems.isEmpty() -> { // Se a lista estiver vazia e não houver erro/carregamento
