@@ -42,6 +42,10 @@ class MyListViewModel(
             }
 
             try {
+                // Sincroniza os dados do Firestore para o Room antes de coletar
+                myListRepository.syncFirestoreToRoom(userId)
+
+                // Coleta os dados do Room
                 myListRepository.getMyList(userId).collect { items ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,

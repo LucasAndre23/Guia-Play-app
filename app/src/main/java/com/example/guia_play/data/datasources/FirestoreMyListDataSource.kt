@@ -56,4 +56,16 @@ class FirestoreMyListDataSource {
         // Verifica se o documento existe E se o campo 'userId' no documento corresponde ao userId fornecido
         return doc.exists() && doc.getString("userId") == userId
     }
+
+    suspend fun getMyListItems(userId: String): List<MyListItem> {
+        return try {
+            val snapshot = myListCollection
+                .whereEqualTo("userId", userId)
+                .get()
+                .await()
+            snapshot.toObjects(MyListItem::class.java)
+        } catch (e: Exception) {
+            throw e
+        }
+    }
 }
