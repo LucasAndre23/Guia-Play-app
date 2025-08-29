@@ -31,6 +31,30 @@ O aplicativo atua como seu hub central para gerenciar seu histórico de visualiz
 
 ---
 
+Padrão UI State (Jetpack Compose)
+O projeto Guia Play adota o padrão UI State para gerenciar o estado das telas de forma reativa e centralizada. Em vez de a interface (a View) ter que lidar com lógicas complexas, ela simplesmente observa um único objeto de estado, que é a 'fonte da verdade' da tela.
+
+Como Funciona
+Cada tela principal possui uma data class específica (HomeUiState, MyListUiState, AuthUiState) que encapsula todos os estados possíveis da interface, como:
+
+Dados: A lista de filmes a ser exibida (myItems, recommendedItems).
+
+Estado de Carregamento: Uma variável Boolean (isLoading) que informa à tela que uma operação assíncrona está em andamento.
+
+Mensagens de Erro: Uma variável String (error) para comunicar falhas ao usuário.
+
+Vantagens da Abordagem
+Unidirecionalidade: O fluxo de dados é sempre do ViewModel para a View, tornando o código mais previsível e fácil de depurar.
+
+Consistência: A tela nunca fica em um estado inconsistente, pois ela sempre se renderiza com base em uma única e completa "fotografia" do estado.
+
+Separação de Responsabilidades: A View é 'burra' (não tem lógica), e o ViewModel é 'inteligente' (gerencia a lógica), o que simplifica a manutenção e os testes.
+
+Com isso, a tela apenas reage a mudanças no UI State, exibindo o conteúdo, um indicador de progresso, uma mensagem de erro ou uma tela de lista vazia de forma automática e eficiente.
+
+---
+
+
 ## Estrutura do Projeto
 
 A seguir, a estrutura de diretórios do projeto :
