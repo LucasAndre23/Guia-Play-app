@@ -31,26 +31,18 @@ O aplicativo atua como seu hub central para gerenciar seu histórico de visualiz
 
 ---
 
-Padrão UI State (Jetpack Compose)
-O projeto Guia Play adota o padrão UI State para gerenciar o estado das telas de forma reativa e centralizada. Em vez de a interface (a View) ter que lidar com lógicas complexas, ela simplesmente observa um único objeto de estado, que é a 'fonte da verdade' da tela.
+## Tecnologias e Arquitetura
 
-Como Funciona
-Cada tela principal possui uma data class específica (HomeUiState, MyListUiState, AuthUiState) que encapsula todos os estados possíveis da interface, como:
+O projeto Guia Play foi construído utilizando um conjunto de tecnologias modernas e uma arquitetura robusta para garantir desempenho, escalabilidade e facilidade de manutenção.
 
-Dados: A lista de filmes a ser exibida (myItems, recommendedItems).
+* **MVVM (Model-View-ViewModel) e View Model:** A arquitetura MVVM separa a lógica de negócio da interface do usuário. Os ViewModels gerenciam o estado da tela e a lógica, tornando o código mais limpo e testável.
+* **UI State:** Cada tela principal utiliza um `UI State` (uma `data class`) para representar todos os seus estados possíveis (carregamento, dados, erro). Isso garante que a UI seja sempre um reflexo consistente dos dados.
+* **Injeção de Dependência com Koin:** O Koin é usado para gerenciar e fornecer as dependências do projeto (como ViewModels e repositórios), simplificando a criação de objetos e a organização do código.
+* **Biblioteca Room:** Utilizada para armazenar dados localmente. O Room permite que o aplicativo armazene a lista de filmes do usuário e outros dados, garantindo que o app funcione mesmo sem conexão com a internet.
+* **Jetpack Compose:** A UI foi construída com o kit de ferramentas moderno do Android, o Jetpack Compose. Ele permite criar interfaces de forma declarativa, resultando em um código mais conciso e reativo.
+* **Google Firestore:** O Firestore é utilizado como backend para armazenar a lista de filmes e séries, além de gerenciar a autenticação de usuários (login e cadastro) de forma segura e em tempo real.
 
-Estado de Carregamento: Uma variável Boolean (isLoading) que informa à tela que uma operação assíncrona está em andamento.
-
-Mensagens de Erro: Uma variável String (error) para comunicar falhas ao usuário.
-
-Vantagens da Abordagem
-Unidirecionalidade: O fluxo de dados é sempre do ViewModel para a View, tornando o código mais previsível e fácil de depurar.
-
-Consistência: A tela nunca fica em um estado inconsistente, pois ela sempre se renderiza com base em uma única e completa "fotografia" do estado.
-
-Separação de Responsabilidades: A View é 'burra' (não tem lógica), e o ViewModel é 'inteligente' (gerencia a lógica), o que simplifica a manutenção e os testes.
-
-Com isso, a tela apenas reage a mudanças no UI State, exibindo o conteúdo, um indicador de progresso, uma mensagem de erro ou uma tela de lista vazia de forma automática e eficiente.
+---
 
 ---
 
